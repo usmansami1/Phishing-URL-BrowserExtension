@@ -7,11 +7,11 @@ git switch -c yourName
 # Bfore starting to code always run these 2 commands
 git switch main   
 git pull origin main   
-(it will copy all the changes in main to your branch)   
+(it will update the main in your laptop)     
 # After above 2 commands
 git switch yourName   
 git merge main  
-(you will be switched to your branch and is will be up to date)   
+(you will be switched to your branch and will be up to date)   
 
 # Everyone add your data below and run the commands to make sure you have access and can make chanages
 Name   | Age | Networth   
