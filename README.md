@@ -10,6 +10,7 @@ git pull origin main
 (it will copy all the changes in main to your branch)   
 # After above 2 commands
 git switch yourName   
+git merge main  
 (you will be switched to your branch and is will be up to date)   
 
 # Everyone add your data below and run the commands to make sure you have access and can make chanages
