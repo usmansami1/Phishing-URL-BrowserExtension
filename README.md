@@ -15,7 +15,8 @@ git merge main
 
 # Everyone add your data below and run the commands to make sure you have access and can make chanages
 Name   | Age | Networth   
-Usman  |  19 | 0   
+Usman  |  19 | 0  
+Baidi  |  20 | 10000000
 (add your data below usman then run the following commands)   
 git add -A   
 git commit -a -m "Added my data in readme"     
