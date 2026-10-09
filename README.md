@@ -4,7 +4,7 @@ git clone https://github.com/usmansami1/Phishing-URL-BrowserExtension.git
 # Everyone create your own branch with your name
 git switch -c yourName     
 (this will create your own branch on your laptop)   
-# Bfore starting to code always run these 2 commands
+# Before starting to code always run these 2 commands
 git switch main   
 git pull origin main   
 (it will update the main in your laptop)     
