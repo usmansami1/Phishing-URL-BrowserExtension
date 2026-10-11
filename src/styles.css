@@ -1,28 +1,33 @@
 /* src/styles.css */
 
-/* Background video & dark overlay */
+/* Ensure root canvas does not obscure background video */
+html,
+body.app-screen {
+  background-color: transparent;
+}
+
 .bg-video {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   z-index: 0;
+  display: block;
   pointer-events: none;
 }
 
-body.app-screen::before,
 .bg-overlay {
-  content: '';
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 0;
+  background: rgba(0, 0, 0, 0.12);
+  z-index: 1;
   pointer-events: none;
 }
 
-/* Main screen container */
+/* ==========================================================================
+   Main Screen Container
+   ========================================================================== */
 body.app-screen {
   position: relative;
   min-height: 100dvh;
@@ -33,32 +38,144 @@ body.app-screen {
   align-items: center;
   justify-content: center;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #333;
+  color: #1a1a1a;
   overflow-x: hidden;
 }
 
-/* Horizontal landscape extension panel (700–760px wide, ~350–400px tall) */
+/* ==========================================================================
+   Horizontal Landscape Extension Panel (Single Reusable Panel)
+   ========================================================================== */
 .extension-panel {
   position: relative;
-  z-index: 1;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 10;
   width: 730px;
   max-width: 100%;
+  height: 360px;
   min-height: 360px;
-  background: #ffffff;
-  border: 1px solid #dcdcdc;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   padding: 16px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Header row (full width) */
+/* Phishing state: locked to exact same central panel size as safe state (730px x 360px) */
+.extension-panel.state-phishing {
+  width: 730px;
+  height: 360px;
+  min-height: 360px;
+  padding: 12px 20px;
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 16px rgba(220, 38, 38, 0.12);
+}
+
+.extension-panel.state-phishing hr.divider {
+  margin: 6px 0 8px 0;
+}
+
+.extension-panel.state-phishing .panel-col-left,
+.extension-panel.state-phishing .panel-col-right {
+  gap: 6px;
+}
+
+.extension-panel.state-phishing .status-card {
+  padding: 7px 10px;
+}
+
+.extension-panel.state-phishing .status-title {
+  font-size: 0.92rem;
+}
+
+.extension-panel.state-phishing .security-checks {
+  padding: 5px 10px;
+}
+
+.extension-panel.state-phishing .checks-heading {
+  margin: 0 0 3px 0;
+  font-size: 0.8rem;
+}
+
+.extension-panel.state-phishing .check-item {
+  padding: 2px 0;
+}
+
+.extension-panel.state-phishing .recommendation {
+  padding: 5px 10px;
+}
+
+.extension-panel.state-phishing .rec-heading {
+  margin: 0 0 2px 0;
+  font-size: 0.8rem;
+}
+
+.extension-panel.state-phishing .rec-body {
+  font-size: 0.72rem;
+  line-height: 1.28;
+}
+
+.extension-panel.state-phishing .action-section {
+  margin-top: 1px;
+  gap: 6px;
+}
+
+.extension-panel.state-phishing .action-btn {
+  padding: 5px 10px;
+  font-size: 0.75rem;
+}
+
+.extension-panel.state-phishing .extension-footer {
+  margin-top: 5px;
+}
+
+/* ==========================================================================
+   Central Panel Background Video & Internal Overlay
+   ========================================================================== */
+.panel-background-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.panel-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.extension-panel.state-phishing .panel-overlay {
+  background: rgba(20, 0, 0, 0.18);
+}
+
+/* Ensure all panel content renders above the background video */
+.extension-header,
+hr.divider,
+.panel-body,
+.extension-footer {
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   Header Row
+   ========================================================================== */
 .extension-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .header-branding {
@@ -68,10 +185,15 @@ body.app-screen {
 }
 
 .header-icon {
-  width: 22px;
-  height: 22px;
-  stroke: #444;
+  width: 24px;
+  height: 24px;
+  stroke: #1a1a1a;
   flex-shrink: 0;
+  transition: stroke 0.3s ease;
+}
+
+.extension-panel.state-phishing .header-icon {
+  stroke: #dc2626;
 }
 
 .header-text {
@@ -83,50 +205,117 @@ body.app-screen {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #111827;
   line-height: 1.15;
 }
 
 .subtitle {
-  margin: 0;
-  font-size: 0.75rem;
-  color: #666;
+  margin: 2px 0 0 0;
+  font-size: 0.74rem;
+  color: #4b5563;
   line-height: 1.2;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.extension-panel.state-phishing .subtitle {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* Header Controls & State Switcher */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.state-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.toggle-pill-btn {
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  padding: 3px 9px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.toggle-pill-btn:hover {
+  color: #111827;
+}
+
+.toggle-pill-btn.active#btnStatePhishing {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.4);
+}
+
+.toggle-pill-btn.active#btnStateSafe {
+  background: #15803d;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(21, 128, 61, 0.4);
 }
 
 .settings-icon {
   width: 20px;
   height: 20px;
-  stroke: #555;
+  stroke: #4b5563;
   cursor: pointer;
   flex-shrink: 0;
+  transition: stroke 0.2s ease, transform 0.2s ease;
 }
 
-/* Thin divider */
+.settings-icon:hover {
+  stroke: #111827;
+  transform: rotate(45deg);
+}
+
+/* Divider */
 hr.divider {
   border: none;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   margin: 10px 0 12px 0;
 }
 
-/* Main content: two columns */
+.extension-panel.state-phishing hr.divider {
+  border-top-color: rgba(220, 38, 38, 0.2);
+}
+
+/* ==========================================================================
+   Main Content: Two Columns Layout
+   ========================================================================== */
 .panel-body {
   display: flex;
-  gap: 18px;
+  gap: 16px;
   align-items: stretch;
   flex: 1;
 }
 
-/* Left column (~55% width) */
+/* Left Column (~55% width) */
 .panel-col-left {
-  flex: 1.2;
+  flex: 1.15;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 10px;
 }
 
-/* Right column (~45% width) */
+/* Right Column (~45% width) */
 .panel-col-right {
   flex: 1;
   display: flex;
@@ -135,7 +324,9 @@ hr.divider {
   gap: 10px;
 }
 
-/* Current website section */
+/* ==========================================================================
+   Current Website Section
+   ========================================================================== */
 .current-website {
   display: flex;
   flex-direction: column;
@@ -144,63 +335,114 @@ hr.divider {
 .section-label {
   font-size: 0.68rem;
   font-weight: 700;
-  color: #666;
+  color: #4b5563;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   margin-bottom: 3px;
 }
 
 .url-field {
-  border: 1px solid #d0d0d0;
-  background: #f7f7f7;
-  padding: 5px 8px;
-  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 9px;
+  border-radius: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.8rem;
-  color: #222;
-  font-family: monospace;
+  color: #111827;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  transition: all 0.3s ease;
 }
 
-/* Safe status */
-.safe-status {
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  background: #fafafa;
+.extension-panel.state-phishing .url-field {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(255, 245, 245, 0.88);
+  color: #991b1b;
+}
+
+/* ==========================================================================
+   Status Section (Safe vs Phishing)
+   ========================================================================== */
+.status-card {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 12px;
+  transition: all 0.3s ease;
 }
 
-.safe-status .status-icon {
+.status-card.status-safe {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(240, 253, 244, 0.85);
+}
+
+.status-card.status-phishing {
+  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(254, 242, 242, 0.88);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
+}
+
+.status-icon-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon {
   width: 32px;
   height: 32px;
-  stroke: #333;
   flex-shrink: 0;
 }
 
-.safe-status-content {
+.status-icon-safe {
+  stroke: #16a34a;
+}
+
+.status-icon-warning {
+  stroke: #dc2626;
+  fill: rgba(220, 38, 38, 0.08);
+}
+
+.status-content {
   flex: 1;
 }
 
-.safe-status .status-title {
+.status-title {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #111827;
   line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
-.safe-status .status-detail {
-  margin: 2px 0 0 0;
-  font-size: 0.76rem;
-  color: #666;
-  line-height: 1.2;
+.status-card.status-phishing .status-title {
+  color: #b91c1c;
 }
 
-/* Risk score */
+.status-card.status-safe .status-title {
+  color: #15803d;
+}
+
+.status-detail {
+  margin: 3px 0 0 0;
+  font-size: 0.75rem;
+  color: #4b5563;
+  line-height: 1.25;
+}
+
+/* ==========================================================================
+   Risk Score Section
+   ========================================================================== */
 .risk-score {
   display: flex;
   flex-direction: column;
@@ -209,21 +451,38 @@ hr.divider {
 .risk-score .risk-header {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   font-size: 0.74rem;
-  color: #555;
+  color: #374151;
   font-weight: 600;
+}
+
+.risk-score .risk-header .value {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.extension-panel.state-phishing .risk-score .risk-header .value {
+  color: #b91c1c;
 }
 
 .risk-level {
   font-size: 0.74rem;
-  color: #555;
+  color: #4b5563;
   margin-top: 2px;
+  font-weight: 500;
+}
+
+.extension-panel.state-phishing .risk-level {
+  color: #dc2626;
+  font-weight: 600;
 }
 
 .progress-bar {
   width: 100%;
   height: 6px;
-  background: #e6e6e6;
+  background: rgba(0, 0, 0, 0.12);
   border-radius: 3px;
   overflow: hidden;
   margin-top: 3px;
@@ -231,24 +490,49 @@ hr.divider {
 
 .progress-fill {
   height: 100%;
-  background: #777;
+  background: #6b7280;
   width: 8%;
   border-radius: 3px;
+  transition: width 0.4s ease, background 0.4s ease;
 }
 
-/* Security checks */
+.extension-panel.state-phishing .progress-fill {
+  background: linear-gradient(90deg, #f59e0b, #ef4444, #dc2626);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.extension-panel.state-safe .progress-fill {
+  background: #22c55e;
+}
+
+/* ==========================================================================
+   Security Checks / Detected Reasons Section
+   ========================================================================== */
 .security-checks {
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  background: #fafafa;
-  padding: 9px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 11px;
+  transition: all 0.3s ease;
 }
 
-.security-checks .checks-heading {
+.extension-panel.state-phishing .security-checks {
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(255, 248, 248, 0.88);
+}
+
+.checks-heading {
   margin: 0 0 6px 0;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #222;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: 0.01em;
+}
+
+.extension-panel.state-phishing .checks-heading {
+  color: #991b1b;
 }
 
 .checks-list {
@@ -257,75 +541,388 @@ hr.divider {
   margin: 0;
 }
 
-.checks-list li {
+.check-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 3px 0;
-  border-bottom: 1px solid #ececec;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.checks-list li:last-child {
+.extension-panel.state-phishing .check-item {
+  border-bottom-color: rgba(220, 38, 38, 0.12);
+}
+
+.check-item:last-child {
   border-bottom: none;
+}
+
+.check-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
 }
 
 .check-icon {
   width: 14px;
   height: 14px;
-  stroke: #444;
-  margin-right: 6px;
   flex-shrink: 0;
 }
 
-.check-name {
-  flex: 1;
-  font-size: 0.78rem;
-  color: #333;
+.check-icon-passed {
+  stroke: #16a34a;
 }
 
-.check-status {
-  font-size: 0.74rem;
-  color: #666;
+.check-icon-danger {
+  stroke: #dc2626;
+  fill: rgba(220, 38, 38, 0.08);
+}
+
+.check-name {
+  font-size: 0.76rem;
+  color: #1f2937;
   font-weight: 500;
 }
 
-/* Recommendation */
-.recommendation {
-  border: 1px solid #d0d0d0;
+.check-status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 6px;
   border-radius: 4px;
-  background: #fafafa;
-  padding: 9px 12px;
+}
+
+.status-badge-passed {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.status-badge-danger {
+  color: #b91c1c;
+  background: rgba(220, 38, 38, 0.14);
+}
+
+/* ==========================================================================
+   Recommendation Section
+   ========================================================================== */
+.recommendation {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 11px;
+  transition: all 0.3s ease;
+}
+
+.extension-panel.state-phishing .recommendation {
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(255, 248, 248, 0.88);
 }
 
 .rec-heading {
   margin: 0 0 3px 0;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #222;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.extension-panel.state-phishing .rec-heading {
+  color: #991b1b;
 }
 
 .rec-body {
   margin: 0;
-  font-size: 0.76rem;
-  color: #555;
+  font-size: 0.75rem;
+  color: #374151;
   line-height: 1.35;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
-/* Footer */
+/* ==========================================================================
+   Action Buttons Section
+   ========================================================================== */
+.action-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.extension-panel.state-safe .action-section {
+  display: none !important;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 5px;
+  padding: 7px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.action-btn .btn-icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+.avoid-btn {
+  flex: 1.4;
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
+}
+
+.avoid-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.45);
+}
+
+.avoid-btn:active {
+  transform: translateY(0);
+}
+
+.secondary-btn {
+  flex: 0.9;
+  background: rgba(255, 255, 255, 0.85);
+  color: #4b5563;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.secondary-btn:hover {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Safety alert toast */
+.safety-alert-banner {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #ffffff;
+  animation: fadeIn 0.2s ease;
+}
+
+.safety-alert-banner .alert-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.safety-alert-banner strong {
+  font-size: 1rem;
+  color: #f87171;
+}
+
+.safety-alert-banner span {
+  font-size: 0.82rem;
+  color: #e5e7eb;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ==========================================================================
+   Dismiss Confirmation Interface (inside existing central panel)
+   ========================================================================== */
+.confirmation-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  animation: confirmFadeIn 0.22s ease;
+}
+
+@keyframes confirmFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirmation-card {
+  width: 100%;
+  max-width: 530px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  padding: 16px 22px;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.confirm-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.confirm-warning-icon {
+  width: 32px;
+  height: 32px;
+  stroke: #dc2626;
+  fill: rgba(220, 38, 38, 0.08);
+}
+
+.confirm-heading {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+}
+
+.confirm-message {
+  margin: 0;
+  font-size: 0.77rem;
+  color: #374151;
+  line-height: 1.35;
+  max-width: 440px;
+}
+
+.confirm-risk-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-radius: 4px;
+  padding: 3px 9px;
+  color: #b91c1c;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin: 2px 0 4px 0;
+}
+
+.confirm-risk-note .note-icon {
+  width: 13px;
+  height: 13px;
+  stroke: #dc2626;
+  fill: rgba(220, 38, 38, 0.1);
+  flex-shrink: 0;
+}
+
+.confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 5px;
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.confirm-btn .btn-icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+/* Primary, recommended action */
+.back-safety-btn {
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
+}
+
+.back-safety-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.45);
+}
+
+.back-safety-btn:active {
+  transform: translateY(0);
+}
+
+/* Secondary, less prominent action */
+.dismiss-anyway-btn {
+  background: rgba(255, 255, 255, 0.7);
+  color: #4b5563;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  font-weight: 500;
+}
+
+.dismiss-anyway-btn:hover {
+  background: #ffffff;
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
 .extension-footer {
   text-align: center;
   margin-top: 10px;
   font-size: 0.7rem;
-  color: #888;
+  color: #6b7280;
 }
 
-/* Responsive: switch to vertical on narrow screens */
+.extension-panel.state-phishing .extension-footer {
+  color: #4b5563;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
 @media (max-width: 768px) {
-  .extension-panel {
+  .extension-panel,
+  .extension-panel.state-phishing {
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
+    height: auto;
     min-height: auto;
     padding: 14px 16px;
   }
@@ -337,6 +934,15 @@ hr.divider {
 
   .panel-col-left,
   .panel-col-right {
+    width: 100%;
+  }
+
+  .action-section {
+    flex-direction: column;
+  }
+
+  .avoid-btn,
+  .secondary-btn {
     width: 100%;
   }
 }

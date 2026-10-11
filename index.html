@@ -3,43 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PhishGuard – Safe Site</title>
+  <title>PhishGuard – Phishing Detected</title>
   <link rel="stylesheet" href="./src/styles.css" />
 </head>
-<body class="app-screen">
-  <video class="bg-video" autoplay loop muted playsinline>
-    <source src="./Citron.mp4" type="video/mp4" />
+<body class="app-screen state-phishing">
+  <!-- Viewport background video: spam_bg covering the entire viewport -->
+  <video id="bgVideo" class="bg-video" autoplay loop muted playsinline src="./spam_bg.mp4">
+    <source src="./spam_bg.mp4" type="video/mp4" />
   </video>
-  <main class="extension-panel">
+
+  <!-- Viewport dark overlay -->
+  <div class="bg-overlay"></div>
+
+  <!-- Single central panel for both Safe and Phishing states -->
+  <main class="extension-panel state-phishing">
+    <!-- Central panel background video: spam_central_bg covering the panel edge to edge -->
+    <video id="panelBgVideo" class="panel-background-video" autoplay loop muted playsinline src="./spam_central_bg.mp4">
+      <source src="./spam_central_bg.mp4" type="video/mp4" />
+    </video>
+
+    <!-- Subtle panel overlay to maintain crisp readability over video -->
+    <div class="panel-overlay"></div>
+
     <!-- Header -->
     <header class="extension-header">
       <div class="header-branding">
-        <svg class="icon header-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <svg class="icon header-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
         <div class="header-text">
           <h1 class="product-name">PhishGuard</h1>
-          <p class="subtitle">URL Security Extension</p>
+          <p class="subtitle" id="headerSubtitle">⚠️ Threat Warning: Phishing Detected</p>
         </div>
       </div>
-      <svg class="icon settings-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0-5c5 0 9 4 9 9s-4 9-9 9-9-4-9-9 4-9 9-9z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+
+      <div class="header-controls">
+        <!-- Interactive State Toggle: switches detector states on the same panel -->
+        <div class="state-toggle" role="group" aria-label="Detector State Switcher">
+          <button type="button" class="toggle-pill-btn active" id="btnStatePhishing" title="Switch to Phishing Detected state">Phishing</button>
+          <button type="button" class="toggle-pill-btn" id="btnStateSafe" title="Switch to Safe Site state">Safe</button>
+        </div>
+        <svg id="settingsIcon" class="icon settings-icon" viewBox="0 0 24 24" aria-label="Toggle State" title="Toggle state"><path d="M12 8a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0-5c5 0 9 4 9 9s-4 9-9 9-9-4-9-9 4-9 9-9z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </div>
     </header>
+
     <hr class="divider" />
 
     <!-- Main content: two columns -->
-    <div class="panel-body">
+    <div class="panel-body" id="panelBody">
       <!-- Left column (~55% width) -->
       <div class="panel-col panel-col-left">
         <!-- Current website -->
         <section class="current-website">
           <label class="section-label">CURRENT WEBSITE</label>
-          <div class="url-field" title="https://www.example.com">https://www.example.com</div>
+          <div class="url-field" id="currentUrlField" title="https://secure-login.paypal-verification-update.com/login">
+            https://secure-login.paypal-verification-update.com/login
+          </div>
         </section>
 
-        <!-- Safe status -->
-        <section class="safe-status">
-          <svg class="status-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-          <div class="safe-status-content">
-            <h2 class="status-title">This website looks safe</h2>
-            <p class="status-detail">No suspicious URL patterns detected.</p>
+        <!-- Status section (Safe or Phishing) -->
+        <section class="status-card status-phishing" id="statusSection">
+          <div class="status-icon-wrapper" id="statusIconWrapper">
+            <svg class="status-icon status-icon-warning" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2L1 21h22L12 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="12" cy="17" r="1.3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="status-content">
+            <h2 class="status-title" id="statusTitle">PHISHING DETECTED</h2>
+            <p class="status-detail" id="statusDetail">Deceptive site identified attempting to steal credentials.</p>
           </div>
         </section>
 
@@ -47,35 +80,53 @@
         <section class="risk-score">
           <div class="risk-header">
             <span class="label">RISK SCORE</span>
-            <span class="value">08 / 100</span>
+            <span class="value" id="riskScoreValue">92 / 100</span>
           </div>
-          <span class="risk-level">Low risk</span>
+          <span class="risk-level" id="riskLevel">Critical risk</span>
           <div class="progress-bar">
-            <div class="progress-fill" style="width: 8%;"></div>
+            <div class="progress-fill" id="riskFill" style="width: 92%;"></div>
           </div>
         </section>
       </div>
 
       <!-- Right column (~45% width) -->
       <div class="panel-col panel-col-right">
-        <!-- Security checks -->
+        <!-- Security checks / reasons -->
         <section class="security-checks">
-          <h3 class="checks-heading">Security checks</h3>
-          <ul class="checks-list">
-            <li>
-              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span class="check-name">URL structure</span>
-              <span class="check-status">Passed</span>
+          <h3 class="checks-heading" id="checksHeading">Detected reasons</h3>
+          <ul class="checks-list" id="checksList">
+            <li class="check-item check-item-danger">
+              <div class="check-left">
+                <svg class="check-icon check-icon-danger" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                </svg>
+                <span class="check-name">Suspicious domain characteristics</span>
+              </div>
+              <span class="check-status status-badge-danger">Flagged</span>
             </li>
-            <li>
-              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span class="check-name">Domain indicators</span>
-              <span class="check-status">Passed</span>
+            <li class="check-item check-item-danger">
+              <div class="check-left">
+                <svg class="check-icon check-icon-danger" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                </svg>
+                <span class="check-name">Possible impersonation of a trusted website</span>
+              </div>
+              <span class="check-status status-badge-danger">Detected</span>
             </li>
-            <li>
-              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span class="check-name">Suspicious characters</span>
-              <span class="check-status">Passed</span>
+            <li class="check-item check-item-danger">
+              <div class="check-left">
+                <svg class="check-icon check-icon-danger" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                </svg>
+                <span class="check-name">Suspicious URL structure</span>
+              </div>
+              <span class="check-status status-badge-danger">Flagged</span>
             </li>
           </ul>
         </section>
@@ -83,8 +134,62 @@
         <!-- Recommendation -->
         <section class="recommendation">
           <h3 class="rec-heading">Recommendation</h3>
-          <p class="rec-body">No obvious warning signs were detected. Continue browsing with normal caution.</p>
+          <p class="rec-body" id="recBody">Do not enter passwords, payment details, or other personal information on this website.</p>
         </section>
+
+        <!-- Actions -->
+        <section class="action-section" id="actionSection">
+          <button type="button" class="action-btn avoid-btn" id="avoidBtn">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M15 9l-6 6m0-6l6 6" fill="none" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Avoid This Website
+          </button>
+          <button type="button" class="action-btn secondary-btn" id="closeBtn">
+            Dismiss
+          </button>
+        </section>
+      </div>
+    </div>
+
+    <!-- Dismiss Confirmation Interface (inside existing central panel) -->
+    <div class="confirmation-view" id="confirmationView" style="display: none;" aria-hidden="true">
+      <div class="confirmation-card">
+        <div class="confirm-icon-wrapper">
+          <svg class="confirm-warning-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2L1 21h22L12 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="12" cy="17" r="1.3" fill="currentColor"/>
+          </svg>
+        </div>
+
+        <h2 class="confirm-heading">Are you sure you want to dismiss this warning?</h2>
+
+        <p class="confirm-message">
+          This website has been flagged as potentially dangerous. Dismissing this warning does not make the website safe.
+        </p>
+
+        <div class="confirm-risk-note">
+          <svg class="note-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="16" r="1" fill="currentColor"/>
+          </svg>
+          <span>Your personal information may be at risk.</span>
+        </div>
+
+        <div class="confirm-actions">
+          <button type="button" class="confirm-btn back-safety-btn" id="btnBackToSafety">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 12H5m7 7l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Go Back to Safety
+          </button>
+          <button type="button" class="confirm-btn dismiss-anyway-btn" id="btnDismissAnyway">
+            Dismiss Anyway
+          </button>
+        </div>
       </div>
     </div>
 
@@ -93,5 +198,7 @@
       <small>PhishGuard • URL Security</small>
     </footer>
   </main>
+
+  <script src="./src/app.js"></script>
 </body>
 </html>
