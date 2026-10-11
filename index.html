@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhishGuard – Safe Site</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body class="app-screen">
+  <video class="bg-video" autoplay loop muted playsinline>
+    <source src="./Citron.mp4" type="video/mp4" />
+  </video>
+  <main class="extension-panel">
+    <!-- Header -->
+    <header class="extension-header">
+      <div class="header-branding">
+        <svg class="icon header-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <div class="header-text">
+          <h1 class="product-name">PhishGuard</h1>
+          <p class="subtitle">URL Security Extension</p>
+        </div>
+      </div>
+      <svg class="icon settings-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0-5c5 0 9 4 9 9s-4 9-9 9-9-4-9-9 4-9 9-9z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </header>
+    <hr class="divider" />
+
+    <!-- Main content: two columns -->
+    <div class="panel-body">
+      <!-- Left column (~55% width) -->
+      <div class="panel-col panel-col-left">
+        <!-- Current website -->
+        <section class="current-website">
+          <label class="section-label">CURRENT WEBSITE</label>
+          <div class="url-field" title="https://www.example.com">https://www.example.com</div>
+        </section>
+
+        <!-- Safe status -->
+        <section class="safe-status">
+          <svg class="status-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <div class="safe-status-content">
+            <h2 class="status-title">This website looks safe</h2>
+            <p class="status-detail">No suspicious URL patterns detected.</p>
+          </div>
+        </section>
+
+        <!-- Risk score -->
+        <section class="risk-score">
+          <div class="risk-header">
+            <span class="label">RISK SCORE</span>
+            <span class="value">08 / 100</span>
+          </div>
+          <span class="risk-level">Low risk</span>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 8%;"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right column (~45% width) -->
+      <div class="panel-col panel-col-right">
+        <!-- Security checks -->
+        <section class="security-checks">
+          <h3 class="checks-heading">Security checks</h3>
+          <ul class="checks-list">
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span class="check-name">URL structure</span>
+              <span class="check-status">Passed</span>
+            </li>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span class="check-name">Domain indicators</span>
+              <span class="check-status">Passed</span>
+            </li>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span class="check-name">Suspicious characters</span>
+              <span class="check-status">Passed</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Recommendation -->
+        <section class="recommendation">
+          <h3 class="rec-heading">Recommendation</h3>
+          <p class="rec-body">No obvious warning signs were detected. Continue browsing with normal caution.</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="extension-footer">
+      <small>PhishGuard • URL Security</small>
+    </footer>
+  </main>
+</body>
+</html>
