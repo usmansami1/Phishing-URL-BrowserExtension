@@ -141,7 +141,7 @@ git push -u origin yourName
 | **Usman** | 19 | $0 |
 | **Baidi** | 20 | $10,000,000 |
 | **Ibrahim** | 19 | $1,000,000,000 |
-| | | |
+| **Anas** | 20 | :) |
 
 </div>
 
