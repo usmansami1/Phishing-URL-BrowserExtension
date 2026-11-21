@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "PhishGuard – Phishing URL Detector",
+  "version": "1.0.0",
+  "description": "Real-time heuristic phishing URL analysis, dynamic status indicators, and manual URL inspection.",
+  "permissions": [
+    "tabs",
+    "webNavigation",
+    "storage"
+  ],
+  "icons": {
+    "16": "icons/icon-default-16.png",
+    "32": "icons/icon-default-32.png",
+    "48": "icons/icon-default-48.png",
+    "128": "icons/icon-default-128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html?mode=popup",
+    "default_icon": {
+      "16": "icons/icon-default-16.png",
+      "32": "icons/icon-default-32.png",
+      "48": "icons/icon-default-48.png",
+      "128": "icons/icon-default-128.png"
+    },
+    "default_title": "PhishGuard – Check URL Security Status"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}
