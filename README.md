@@ -140,13 +140,12 @@ git push -u origin yourName
 |:--------:|:------:|:-----------:|
 | **Usman** | 19 | $0 |
 | **Baidi** | 20 | $10,000,000 |
-| **Ibrahim** | 19 | $1,000,000,000 |
+
 | | | |
 
 </div>
 
 > [!TIP]
-> Add your row below Ibrahim's data, then follow the push workflow in **Step 3** above.
 
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
 

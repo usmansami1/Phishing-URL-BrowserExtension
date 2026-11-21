@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhishGuard – Check a URL</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+  <link rel="stylesheet" href="./src/scanner.css" />
+</head>
+<body class="app-screen state-neutral scanner-screen">
+  <video id="bgVideo" class="bg-video bg-video-layer bg-video-safe" autoplay loop muted playsinline preload="auto" src="./Citron.mp4">
+    <source src="./Citron.mp4" type="video/mp4" />
+  </video>
+  <video id="bgVideoPhishing" class="bg-video bg-video-layer bg-video-phishing" autoplay loop muted playsinline preload="auto" src="./spam_bg.mp4">
+    <source src="./spam_bg.mp4" type="video/mp4" />
+  </video>
+  <div class="bg-overlay"></div>
+
+  <main class="extension-panel scanner-panel state-neutral" id="scannerPanel">
+    <video id="panelBgVideo" class="panel-background-video panel-video-layer panel-video-safe" autoplay loop muted playsinline preload="auto" src="./blend.mp4">
+      <source src="./blend.mp4" type="video/mp4" />
+    </video>
+    <video id="panelBgVideoPhishing" class="panel-background-video panel-video-layer panel-video-phishing" autoplay loop muted playsinline preload="auto" src="./spam_central_bg.mp4">
+      <source src="./spam_central_bg.mp4" type="video/mp4" />
+    </video>
+    <div class="panel-overlay"></div>
+    <div class="panel-accent-wash" id="panelAccentWash" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="extension-header">
+      <div class="header-branding">
+        <svg class="icon header-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <div class="header-text">
+          <h1 class="product-name">PhishGuard</h1>
+          <p class="subtitle" id="scannerHeaderSubtitle">Manual URL Scanner</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button type="button" class="scanner-nav-btn" id="openInTabBtn" title="Open scanned URL in full interface tab">
+          Open in Full Interface
+        </button>
+        <button type="button" class="scanner-nav-btn" id="backToTabBtn" title="Return to active tab security status">
+          ← Tab Status
+        </button>
+      </div>
+    </header>
+
+    <hr class="divider" />
+
+    <!-- Scanner Workspace -->
+    <div class="scanner-body">
+      <section class="scanner-input-card">
+        <div class="scanner-title-row">
+          <h2 class="scanner-heading" id="scannerHeading">Check a URL</h2>
+          <span class="scanner-offline-pill">Safe String Scan</span>
+        </div>
+
+        <form class="scanner-form" id="scannerForm" novalidate>
+          <input
+            type="text"
+            id="scannerUrlInput"
+            class="scanner-input"
+            placeholder="Paste or enter a URL"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="URL to scan"
+          />
+          <button type="submit" class="scanner-submit-btn" id="scanUrlBtn">
+            Scan URL
+          </button>
+          <button type="button" class="scanner-clear-btn" id="clearScannerBtn" title="Clear input and results">
+            Clear
+          </button>
+        </form>
+
+        <div class="scanner-validation-error" id="scannerValidationError" role="alert" style="display: none;"></div>
+      </section>
+
+      <div class="scanner-output-stage" id="scannerOutputStage">
+        <!-- Loading State -->
+        <section class="scanner-loading-card" id="scannerLoadingState" style="display: none;" aria-live="polite">
+        <div class="scanner-spinner" aria-hidden="true"></div>
+        <div class="scanner-loading-text">
+          <strong>Analyzing URL features...</strong>
+          <span>Evaluating domain patterns, brand similarity, and URL structure without visiting the link.</span>
+        </div>
+      </section>
+
+      <!-- Empty Hint (before first scan) -->
+      <section class="scanner-empty-hint" id="scannerEmptyHint">
+        <span>Enter any URL above and click <strong>Scan URL</strong> to examine its classification, structural features, and phishing indicators safely.</span>
+      </section>
+
+      <!-- Scan Results Section -->
+      <section class="scanner-results" id="scannerResults" style="display: none;" aria-live="polite">
+        <div class="scanner-results-top">
+          <!-- Left: Qualitative Classification + Detected URL + Domain -->
+          <div class="scanner-summary-col">
+            <div class="status-card status-neutral scanner-verdict-card" id="scannerVerdictCard">
+              <div class="status-icon-wrapper scanner-verdict-icon" id="scannerStatusIconWrapper">
+                <svg class="status-icon status-icon-warning" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="status-content">
+                <div class="scanner-verdict-head">
+                  <span class="scanner-classification-badge badge-neutral" id="classificationBadge">IDLE</span>
+                </div>
+                <h3 class="status-title scanner-verdict-title" id="scannerVerdictTitle">Ready to Scan</h3>
+                <p class="status-detail scanner-verdict-desc" id="scannerVerdictExplanation"></p>
+              </div>
+            </div>
+
+            <div class="scanner-detected-box">
+              <span class="section-label">DETECTED URL</span>
+              <div class="url-field scanner-detected-url" id="detectedUrlDisplay"></div>
+            </div>
+
+            <div class="scanner-meta-grid">
+              <div class="scanner-meta-item">
+                <span class="section-label">DETECTED DOMAIN</span>
+                <span class="scanner-meta-val" id="detectedDomainDisplay">—</span>
+              </div>
+              <div class="scanner-meta-item" id="impersonatedBrandRow" style="display: none;">
+                <span class="section-label">IMPERSONATED BRAND</span>
+                <span class="scanner-meta-val scanner-brand-val" id="impersonatedBrandDisplay">—</span>
+              </div>
+            </div>
+
+            <div class="scanner-rec-box">
+              <h3 class="rec-heading">Recommendation</h3>
+              <p class="rec-body" id="scannerRecommendation"></p>
+            </div>
+          </div>
+
+          <!-- Right: Reasons & Extracted Features -->
+          <div class="scanner-details-col">
+            <div class="scanner-detail-card">
+              <h3 class="checks-heading" id="scannerReasonsHeading">Reasons behind classification</h3>
+              <ul class="checks-list scanner-reasons-list" id="reasonsList"></ul>
+            </div>
+
+            <div class="scanner-detail-card">
+              <h3 class="checks-heading">Extracted URL features</h3>
+              <div class="scanner-features-grid" id="suspiciousFeaturesList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="extension-footer">
+      <small>PhishGuard • Manual URL Inspection (No network requests sent to scanned URLs)</small>
+    </footer>
+  </main>
+
+  <script src="./src/brandDetector.js"></script>
+  <script src="./src/urlAnalyzer.js"></script>
+  <script src="./src/ruleEngine.js"></script>
+  <script src="./src/riskScorer.js"></script>
+  <script src="./src/detector.js"></script>
+  <script src="./src/transitions.js"></script>
+  <script src="./src/scanner.js"></script>
+</body>
+</html>
